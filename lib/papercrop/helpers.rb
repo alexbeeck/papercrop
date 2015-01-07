@@ -18,6 +18,7 @@ module Papercrop
       if self.object.send(attachment).class == Paperclip::Attachment
         wrapper_options = {
           :id    => "#{attachment}_crop_preview_wrapper",
+          :class => "crop_preview_wrapper #{opts[:class]}",
           :style => "width:#{width}px; height:#{height}px; overflow:hidden"
         }
 
@@ -43,6 +44,11 @@ module Papercrop
       box_width       = opts[:width] || original_width
 
       if self.object.send(attachment).class == Paperclip::Attachment
+        wrapper_options = {
+          :id    => "#{attachment}_crop_wrapper",
+          :class => "crop_wrapper #{opts[:class]}"
+        }
+
         box  = self.hidden_field(:"#{attachment}_original_w", :value => original_width)
         box << self.hidden_field(:"#{attachment}_original_h", :value => original_height)
         box << self.hidden_field(:"#{attachment}_box_w",      :value => box_width)
@@ -53,7 +59,7 @@ module Papercrop
 
         crop_image = @template.image_tag(self.object.send(attachment).url)
 
-        box << @template.content_tag(:div, crop_image, :id => "#{attachment}_cropbox")
+        box << @template.content_tag(:div, crop_image, wrapper_options)
       end
     end
   end

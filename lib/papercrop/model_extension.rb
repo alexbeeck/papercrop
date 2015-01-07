@@ -14,7 +14,7 @@ module Papercrop
       # @param attachment_name [Symbol] Name of the desired attachment to crop
       # @param opts [Hash]
       def crop_attached_file(attachment_name, opts = {})
-        [:crop_x, :crop_y, :crop_w, :crop_h, :original_w, :original_h, :box_w, :aspect, :cropped_geometries].each do |a|
+        [:aspect, :cropped_geometries].each do |a|
           attr_accessor :"#{attachment_name}_#{a}"
         end
 
@@ -28,6 +28,18 @@ module Papercrop
 
         send :define_method, :"#{attachment_name}_aspect" do
           opts[:aspect].first.to_f / opts[:aspect].last.to_f
+        end
+        
+        send :define_method, :"#{attachment_name}_paperclip_columns" do
+          {
+            :crop_x       => :string,
+            :crop_y       => :string,
+            :crop_w       => :string,
+            :crop_h       => :string,
+            :original_w   => :string,
+            :original_h   => :string,
+            :box_w        => :string
+          }
         end
 
         if respond_to? :attachment_definitions
@@ -83,15 +95,6 @@ module Papercrop
         end
       end
 
-
-      # Sets all cropping attributes to nil
-      # @param  attachment_name [Symbol]
-      def reset_crop_attributes_of(attachment_name)
-        [:crop_x, :crop_y, :crop_w, :crop_h].each do |a|
-          self.send :"#{attachment_name}_#{a}=", nil
-        end
-      end
-
       private
 
         # Saves the attachment if the crop attributes are present
@@ -101,11 +104,8 @@ module Papercrop
             attachment_instance = send(attachment_name)
             attachment_instance.assign(attachment_instance)
             attachment_instance.save
-
-            reset_crop_attributes_of(attachment_name)
           end
         end
-
     end
   end
 end
