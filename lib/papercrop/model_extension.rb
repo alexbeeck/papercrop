@@ -95,6 +95,14 @@ module Papercrop
         end
       end
 
+      # Sets all cropping attributes to nil
+      # @param  attachment_name [Symbol]
+      def reset_crop_attributes_of(attachment_name)
+        [:crop_x, :crop_y, :crop_w, :crop_h].each do |a|
+          self.send :"#{attachment_name}_#{a}=", nil
+        end
+      end
+      
       private
 
         # Saves the attachment if the crop attributes are present
